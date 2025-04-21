@@ -4,7 +4,6 @@ import { useEffect } from "react";
 function App() {
   useEffect(() => {
     const API_KEY = "e6d02aec03da2632c5505afa1f2670ec"; //add your API KEY
-    const COORDS = "coords"; //좌표를 받을 변수
 
     //DOM객체들
     const weatherInfo = document.querySelector(".weatherInfo");
@@ -24,10 +23,6 @@ function App() {
     function handleSuccess(position) {
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
-      const coordsObj = {
-        latitude,
-        longitude,
-      };
       getWeather(latitude, longitude); //얻은 좌표값을 바탕으로 날씨정보를 불러온다.
     }
     //좌표를 얻는데 실패했을 때 쓰이는 함수
@@ -86,7 +81,7 @@ function App() {
     <div class="container">
       <h1>지금 날씨는</h1>
       <span class="weatherInfo"></span>
-      <img class="weatherIcon" />
+      <img class="weatherIcon" alt="" />
       <div id="time" class="time"></div>
       <div id="date" class="date"></div>
     </div>
