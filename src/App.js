@@ -3,22 +3,18 @@ import { useEffect } from "react";
 
 function App() {
   useEffect(() => {
-    const API_KEY = "e6d02aec03da2632c5505afa1f2670ec"; //add your API KEY
-
+    const API_KEY = "e6d02aec03da2632c5505afa1f2670ec"; //API KEY
     //DOM객체들
     const weatherInfo = document.querySelector(".weatherInfo");
     const weatherIconImg = document.querySelector(".weatherIcon");
-
     //초기화
     function init() {
       askForCoords();
     }
-
     //좌표를 물어보는 함수
     function askForCoords() {
       navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
     }
-
     //좌표를 얻는데 성공했을 때 쓰이는 함수
     function handleSuccess(position) {
       const latitude = position.coords.latitude;
@@ -29,7 +25,6 @@ function App() {
     function handleError() {
       console.log("can't not access to location");
     }
-
     //날씨 api를 통해 날씨에 관련된 정보들을 받아온다.
     function getWeather(lat, lon) {
       fetch(
@@ -45,13 +40,13 @@ function App() {
           const weatherDescription = json.weather[0].description;
           const weatherIcon = json.weather[0].icon;
           const weatherIconAdrs = `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
-
           //받아온 정보들을 표현한다.
           weatherInfo.innerText = `${temperature} °C / @${place} / ${weatherDescription}`;
           weatherIconImg.setAttribute("src", weatherIconAdrs);
         })
         .catch((error) => console.log("error:", error));
     }
+    //현재 시간을 보여주는 함수
     function setClock() {
       var dateInfo = new Date();
       var hour = modifyNumber(dateInfo.getHours());
@@ -65,6 +60,7 @@ function App() {
       document.getElementById("date").innerHTML =
         year + "년 " + month + "월 " + date + "일";
     }
+    //시간을 2자리로 맞춰주는 함수
     function modifyNumber(time) {
       if (parseInt(time) < 10) {
         return "0" + time;
