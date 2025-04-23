@@ -1,6 +1,7 @@
 # 🐣 WEATHER GPS
 
 **🚀 배포 링크**: [weather gps 바로가기](https://lively-sunflower-727a6f.netlify.app/)
+**🚀 블로그**: [블로그 바로가기](https://blog.naver.com/auroratime020715/223843741998)
 
 날씨api를이용한 날씨gps 앱입니다.
 
