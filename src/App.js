@@ -41,7 +41,7 @@ function App() {
           const weatherIcon = json.weather[0].icon;
           const weatherIconAdrs = `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
           //받아온 정보들을 표현한다.
-          weatherInfo.innerText = `${temperature} °C / @${place} / ${weatherDescription}`;
+          weatherInfo.innerText = `온도: ${temperature} °C / 위치: ${place} /날씨: ${weatherDescription}`;
           weatherIconImg.setAttribute("src", weatherIconAdrs);
         })
         .catch((error) => console.log("error:", error));

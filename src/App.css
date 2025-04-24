@@ -14,10 +14,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .container * {
-  margin: 10px;
+  margin: 10px auto;
+  max-width: 95%;
   color: #fce4ec;
 }
 
