@@ -1,85 +1,140 @@
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
-  useEffect(() => {
-    const API_KEY = "e6d02aec03da2632c5505afa1f2670ec"; //API KEY
-    //DOM객체들
-    const weatherInfo = document.querySelector(".weatherInfo");
-    const weatherIconImg = document.querySelector(".weatherIcon");
-    //초기화
-    function init() {
-      askForCoords();
-    }
-    //좌표를 물어보는 함수
-    function askForCoords() {
-      navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
-    }
-    //좌표를 얻는데 성공했을 때 쓰이는 함수
-    function handleSuccess(position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      getWeather(latitude, longitude); //얻은 좌표값을 바탕으로 날씨정보를 불러온다.
-    }
-    //좌표를 얻는데 실패했을 때 쓰이는 함수
-    function handleError() {
-      console.log("can't not access to location");
-    }
-    //날씨 api를 통해 날씨에 관련된 정보들을 받아온다.
-    function getWeather(lat, lon) {
-      fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`
-      )
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (json) {
-          //온도, 위치, 날씨묘사, 날씨아이콘을 받는다.
-          const temperature = json.main.temp;
-          const place = json.name;
-          const weatherDescription = json.weather[0].description;
-          const weatherIcon = json.weather[0].icon;
-          const weatherIconAdrs = `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
-          //받아온 정보들을 표현한다.
-          weatherInfo.innerText = `온도: ${temperature} °C / 위치: ${place} /날씨: ${weatherDescription}`;
-          weatherIconImg.setAttribute("src", weatherIconAdrs);
-        })
-        .catch((error) => console.log("error:", error));
-    }
-    //현재 시간을 보여주는 함수
-    function setClock() {
-      var dateInfo = new Date();
-      var hour = modifyNumber(dateInfo.getHours());
-      var min = modifyNumber(dateInfo.getMinutes());
-      var sec = modifyNumber(dateInfo.getSeconds());
-      var year = dateInfo.getFullYear();
-      var month = dateInfo.getMonth() + 1;
-      var date = dateInfo.getDate();
-      document.getElementById("time").innerHTML =
-        "현재시간" + hour + ":" + min + ":" + sec;
-      document.getElementById("date").innerHTML =
-        year + "년 " + month + "월 " + date + "일";
-    }
-    //시간을 2자리로 맞춰주는 함수
-    function modifyNumber(time) {
-      if (parseInt(time) < 10) {
-        return "0" + time;
-      } else return time;
-    }
-    window.onload = function () {
-      setClock();
-      setInterval(setClock, 1000);
-    };
+  const [city, setCity] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
+  const [dateTime, setDateTime] = useState({
+    time: "",
+    date: "",
+  });
+  const getWeatherClass = (desc) => {
+    if (!desc) return "";
+    if (desc.includes("맑음")) return "clear";
+    if (desc.includes("구름")) return "cloudy";
+    if (desc.includes("비")) return "rainy";
+    if (desc.includes("눈")) return "snowy";
+    if (desc.includes("안개")) return "foggy";
+    return "default";
+  };
 
-    init();
+  const API_KEY = "e6d02aec03da2632c5505afa1f2670ec"; // 본인 API 키
+
+  // 시간 관련 설정
+  useEffect(() => {
+    const setClock = () => {
+      const dateInfo = new Date();
+      const modify = (num) => (num < 10 ? "0" + num : num);
+      setDateTime({
+        time:
+          "현재시간 " +
+          modify(dateInfo.getHours()) +
+          ":" +
+          modify(dateInfo.getMinutes()) +
+          ":" +
+          modify(dateInfo.getSeconds()),
+        date:
+          dateInfo.getFullYear() +
+          "년 " +
+          (dateInfo.getMonth() + 1) +
+          "월 " +
+          dateInfo.getDate() +
+          "일",
+      });
+    };
+    setClock();
+    const timer = setInterval(setClock, 1000);
+    return () => clearInterval(timer);
   }, []);
+
+  // 위치 기반 날씨 불러오기
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
+
+    function handleSuccess(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      getWeatherByCoords(lat, lon);
+    }
+
+    function handleError() {
+      console.log("위치 접근 실패");
+    }
+  }, []);
+
+  // 도시명으로 검색하는 날씨 요청
+  const getWeatherByCity = () => {
+    if (!city.trim()) return;
+
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        setWeatherData({
+          temp: json.main.temp,
+          place: json.name,
+          desc: json.weather[0].description,
+          icon: `http://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`,
+        });
+      })
+      .catch((err) => console.log("검색 실패:", err));
+  };
+
+  // 좌표로 날씨 요청
+  const getWeatherByCoords = (lat, lon) => {
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        setWeatherData({
+          temp: json.main.temp,
+          place: json.name,
+          desc: json.weather[0].description,
+          icon: `http://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`,
+        });
+      })
+      .catch((err) => console.log("위치 기반 실패:", err));
+  };
+
   return (
-    <div class="container">
+    <div className={`container ${getWeatherClass(weatherData?.desc)}`}>
       <h1>지금 날씨는</h1>
-      <span class="weatherInfo"></span>
-      <img class="weatherIcon" alt="" />
-      <div id="time" class="time"></div>
-      <div id="date" class="date"></div>
+
+      {/* 검색 필드 */}
+      <div className="search-box">
+        <input
+          type="text"
+          value={city}
+          placeholder="도시명을 입력하세요"
+          onChange={(e) => setCity(e.target.value)}
+        />
+        <button onClick={getWeatherByCity}>검색</button>
+      </div>
+
+      {/* 날씨 정보 출력 */}
+      {weatherData && (
+        <>
+          <span className="weatherInfo">
+            온도: {weatherData.temp} °C / 위치: {weatherData.place} / 날씨:{" "}
+            {weatherData.desc}
+          </span>
+          <img
+            className="weatherIcon"
+            src={weatherData.icon}
+            alt="날씨 아이콘"
+          />
+        </>
+      )}
+
+      {/* 현재 시간 */}
+      <div id="time" className="time">
+        {dateTime.time}
+      </div>
+      <div id="date" className="date">
+        {dateTime.date}
+      </div>
     </div>
   );
 }
