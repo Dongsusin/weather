@@ -8,19 +8,8 @@ function App() {
     time: "",
     date: "",
   });
-  const getWeatherClass = (desc) => {
-    if (!desc) return "";
-    if (desc.includes("맑음")) return "clear";
-    if (desc.includes("구름")) return "cloudy";
-    if (desc.includes("비")) return "rainy";
-    if (desc.includes("눈")) return "snowy";
-    if (desc.includes("안개")) return "foggy";
-    return "default";
-  };
-
-  const API_KEY = "e6d02aec03da2632c5505afa1f2670ec"; // 본인 API 키
-
-  // 시간 관련 설정
+  const [isDaytime, setIsDaytime] = useState(true);
+  const API_KEY = "e6d02aec03da2632c5505afa1f2670ec";
   useEffect(() => {
     const setClock = () => {
       const dateInfo = new Date();
@@ -41,13 +30,18 @@ function App() {
           dateInfo.getDate() +
           "일",
       });
+      const hour = dateInfo.getHours();
+      if (hour >= 6 && hour < 18) {
+        setIsDaytime(true);
+      } else {
+        setIsDaytime(false);
+      }
     };
+
     setClock();
     const timer = setInterval(setClock, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // 위치 기반 날씨 불러오기
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
 
@@ -61,8 +55,6 @@ function App() {
       console.log("위치 접근 실패");
     }
   }, []);
-
-  // 도시명으로 검색하는 날씨 요청
   const getWeatherByCity = () => {
     if (!city.trim()) return;
 
@@ -76,12 +68,12 @@ function App() {
           place: json.name,
           desc: json.weather[0].description,
           icon: `http://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`,
+          humidity: json.main.humidity,
+          windSpeed: json.wind.speed,
         });
       })
       .catch((err) => console.log("검색 실패:", err));
   };
-
-  // 좌표로 날씨 요청
   const getWeatherByCoords = (lat, lon) => {
     fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`
@@ -93,27 +85,30 @@ function App() {
           place: json.name,
           desc: json.weather[0].description,
           icon: `http://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`,
+          humidity: json.main.humidity,
+          windSpeed: json.wind.speed,
         });
       })
       .catch((err) => console.log("위치 기반 실패:", err));
   };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      getWeatherByCity();
+    }
+  };
 
   return (
-    <div className={`container ${getWeatherClass(weatherData?.desc)}`}>
+    <div className={`container ${isDaytime ? "daytime" : "nighttime"}`}>
       <h1>지금 날씨는</h1>
-
-      {/* 검색 필드 */}
       <div className="search-box">
         <input
           type="text"
           value={city}
           placeholder="도시명을 입력하세요"
           onChange={(e) => setCity(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <button onClick={getWeatherByCity}>검색</button>
       </div>
-
-      {/* 날씨 정보 출력 */}
       {weatherData && (
         <>
           <span className="weatherInfo">
@@ -125,10 +120,12 @@ function App() {
             src={weatherData.icon}
             alt="날씨 아이콘"
           />
+          <div className="additional-info">
+            <p>습도: {weatherData.humidity}%</p>
+            <p>바람 속도: {weatherData.windSpeed} m/s</p>
+          </div>
         </>
       )}
-
-      {/* 현재 시간 */}
       <div id="time" className="time">
         {dateTime.time}
       </div>

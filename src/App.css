@@ -1,74 +1,116 @@
+/* 기본 스타일 */
 * {
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 body {
   overflow: hidden;
+  font-family: Arial, sans-serif;
 }
-
 .container {
   text-align: center;
   padding: 30px;
   transition: all 0.5s ease;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  color: #fff; /* 기본 텍스트 색상 */
 }
-
-/* 날씨별 배경 스타일 */
-.clear {
-  background: url("./image/clear.jpg") no-repeat center center/cover;
+/* 낮과 밤에 따라 배경색과 글자 색상 변경 */
+.daytime {
+  background-color: #fff;
+  color: #333;
 }
-
-.cloudy {
-  background: url("./image/cloudy.jpg") no-repeat center center/cover;
+.nighttime {
+  background-color: #333;
+  color: #fff;
 }
-
-.rainy {
-  background: url("./image/rainy.jpg") no-repeat center center/cover;
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
-
-.snowy {
-  background: url("./image/snowy.jpg") no-repeat center center/cover;
-}
-
-.foggy {
-  background: url("./image/foggy.jpg") no-repeat center center/cover;
-}
-
-.default {
-  background: linear-gradient(#888, #333);
-}
-
-/* 기타 요소 스타일 */
 .search-box input {
-  padding: 8px;
-  width: 200px;
+  padding: 12px;
+  width: 250px;
   margin-right: 8px;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
-
 .weatherInfo {
   display: block;
   margin: 20px 0;
-  font-size: 18px;
+  font-size: 1.8em;
+  transition: all 0.5s ease;
 }
-
-.container * {
-  margin: 10px auto;
-  max-width: 95%;
+.weatherIcon {
+  width: 100px;
+  height: 100px;
+  margin: 20px 0;
 }
-
-.container h1 {
-  font-size: 3em;
+.additional-info p {
+  font-size: 1.2em;
+  margin-top: 10px;
 }
-.weatherInfo {
-  font-size: 1.5em;
-}
-.data {
-  font-size: 25px;
-  color: black;
-}
-.time {
-  font-size: 20px;
+.time,
+.date {
+  font-size: 1.2em;
   font-weight: 700;
-  color: black;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+.container h1 {
+  font-size: 3.5em;
+  margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+  .container h1 {
+    font-size: 2.5em;
+  }
+  .weatherInfo {
+    font-size: 1.5em;
+  }
+  .additional-info p {
+    font-size: 1em;
+  }
+  .time,
+  .date {
+    font-size: 1em;
+  }
+  .search-box input {
+    width: 200px;
+  }
+  .search-box button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+@media (max-width: 480px) {
+  .container h1 {
+    font-size: 2em;
+  }
+  .weatherInfo {
+    font-size: 1.2em;
+  }
+  .additional-info p {
+    font-size: 0.9em;
+  }
+  .time,
+  .date {
+    font-size: 0.9em;
+  }
+  .search-box input {
+    width: 180px;
+  }
+  .search-box button {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+  }
 }
