@@ -1,26 +1,22 @@
 # 🐣 WEATHER GPS
 
 **🚀 배포 링크**: [weather gps 바로가기](https://lively-sunflower-727a6f.netlify.app/)
-**🚀 블로그**: [블로그 바로가기](https://blog.naver.com/auroratime020715/223843741998)
 
-날씨api를이용한 날씨gps 앱입니다.
+날씨API를 이용한 날씨GPS 앱입니다.
 
 <br>
-  <img src="./weather.png"/> 
+  <img src="./weather.png"/>
 <br>
 
 ## 사용 기술
 
-- react
-- weather api
+- React
+- OpenWeatherMap API (Weather API)
 - 시간 관리 함수
-- 현재위치를 받는 함수
-
-<br>
+- 현재 위치를 받는 함수
 
 ## 주요 기능
 
-- weatherAPI를 이용한 날씨정보 받아오기
-- 현재위치의 날씨, 날씨아이콘,현재시간,날짜등 표시
-- 1초단위 시간 진행
-  <br>
+- Weather API를 이용한 날씨 정보 받아오기
+- 현재 위치의 날씨, 날씨 아이콘, 현재 시간 및 날짜 표시
+- 1초 단위로 시간 진행하여 실시간으로 시간과 날짜 표시
