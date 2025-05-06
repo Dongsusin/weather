@@ -172,7 +172,7 @@ function App() {
                     center={[coords.lat, coords.lon]}
                     zoom={13}
                     scrollWheelZoom={false}
-                    style={{ height: "300px", width: "100%" }}
+                    style={{ height: "500px", width: "100%" }}
                   >
                     <TileLayer
                       attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
