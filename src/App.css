@@ -42,6 +42,7 @@ body {
   height: 100vh;
   perspective: 1000px;
   margin: auto;
+  overflow: auto;
 }
 
 .card .card-front,
