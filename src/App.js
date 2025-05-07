@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// 기본 마커 아이콘 설정 (마커 안 보일 때 해결용)
+// Leaflet 기본 마커 아이콘 경로 설정 (마커가 안 보일 때 해결용)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -19,54 +19,47 @@ function App() {
   const [dateTime, setDateTime] = useState({ time: "", date: "" });
   const [isDaytime, setIsDaytime] = useState(true);
   const [coords, setCoords] = useState(null);
-  const [isFlipped, setIsFlipped] = useState(false); // 카드 flip 상태
+  const [isFlipped, setIsFlipped] = useState(false); // 카드 앞/뒷면 상태
 
   const API_KEY = "e6d02aec03da2632c5505afa1f2670ec";
 
+  // 시계 & 낮/밤 구분
   useEffect(() => {
     const setClock = () => {
-      const dateInfo = new Date();
-      const modify = (num) => (num < 10 ? "0" + num : num);
+      const now = new Date();
+      const pad = (num) => (num < 10 ? "0" + num : num);
+      const hours = now.getHours();
+
       setDateTime({
-        time:
-          "현재시간 " +
-          modify(dateInfo.getHours()) +
-          ":" +
-          modify(dateInfo.getMinutes()) +
-          ":" +
-          modify(dateInfo.getSeconds()),
-        date:
-          dateInfo.getFullYear() +
-          "년 " +
-          (dateInfo.getMonth() + 1) +
-          "월 " +
-          dateInfo.getDate() +
-          "일",
+        time: `현재시간 ${pad(hours)}:${pad(now.getMinutes())}:${pad(
+          now.getSeconds()
+        )}`,
+        date: `${now.getFullYear()}년 ${
+          now.getMonth() + 1
+        }월 ${now.getDate()}일`,
       });
-      const hour = dateInfo.getHours();
-      setIsDaytime(hour >= 6 && hour < 18);
+
+      setIsDaytime(hours >= 6 && hours < 18);
     };
 
     setClock();
-    const timer = setInterval(setClock, 1000);
-    return () => clearInterval(timer);
+    const interval = setInterval(setClock, 1000);
+    return () => clearInterval(interval);
   }, []);
 
+  // 현재 위치 기반 날씨
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
-
-    function handleSuccess(position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      setCoords({ lat, lon });
-      getWeatherByCoords(lat, lon);
-    }
-
-    function handleError() {
-      console.log("위치 접근 실패");
-    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        setCoords({ lat, lon });
+        getWeatherByCoords(lat, lon);
+      },
+      () => console.log("위치 접근 실패")
+    );
   }, []);
 
+  // 도시명으로 날씨 가져오기
   const getWeatherByCity = () => {
     if (!city.trim()) return;
 
@@ -74,51 +67,52 @@ function App() {
       `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`
     )
       .then((res) => res.json())
-      .then((json) => {
+      .then((data) => {
         setWeatherData({
-          temp: json.main.temp,
-          place: json.name,
-          desc: json.weather[0].description,
-          icon: `http://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`,
-          humidity: json.main.humidity,
-          windSpeed: json.wind.speed,
+          temp: data.main.temp,
+          place: data.name,
+          desc: data.weather[0].description,
+          icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+          humidity: data.main.humidity,
+          windSpeed: data.wind.speed,
         });
       })
       .catch((err) => console.log("검색 실패:", err));
   };
 
+  // 좌표로 날씨 가져오기
   const getWeatherByCoords = (lat, lon) => {
     fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`
     )
       .then((res) => res.json())
-      .then((json) => {
+      .then((data) => {
         setWeatherData({
-          temp: json.main.temp,
-          place: json.name,
-          desc: json.weather[0].description,
-          icon: `http://openweathermap.org/img/wn/${json.weather[0].icon}@2x.png`,
-          humidity: json.main.humidity,
-          windSpeed: json.wind.speed,
+          temp: data.main.temp,
+          place: data.name,
+          desc: data.weather[0].description,
+          icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+          humidity: data.main.humidity,
+          windSpeed: data.wind.speed,
         });
       })
       .catch((err) => console.log("위치 기반 실패:", err));
   };
 
+  // Enter 키로 검색
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      getWeatherByCity();
-    }
+    if (e.key === "Enter") getWeatherByCity();
   };
 
+  // 카드 앞/뒷면 토글
   const handleCardFlip = () => {
-    setIsFlipped((prevState) => !prevState); // 카드 flip 상태 변경
+    setIsFlipped((prev) => !prev);
   };
 
   return (
     <div className={`container ${isDaytime ? "daytime" : "nighttime"}`}>
       <div className={`card ${isFlipped ? "flipped" : ""}`}>
-        {/* 날씨 정보 (앞면) */}
+        {/* 앞면: 날씨 */}
         {!isFlipped && (
           <div className="card-front">
             <h1>지금 날씨는</h1>
@@ -148,20 +142,15 @@ function App() {
                 </div>
               </>
             )}
-            <div id="time" className="time">
-              {dateTime.time}
-            </div>
-            <div id="date" className="date">
-              {dateTime.date}
-            </div>
-            {/* 버튼: 뒤집기 */}
+            <div className="time">{dateTime.time}</div>
+            <div className="date">{dateTime.date}</div>
             <button className="flip-button" onClick={handleCardFlip}>
               위치 보기
             </button>
           </div>
         )}
 
-        {/* 위치 정보 (뒷면) */}
+        {/* 뒷면: 지도 */}
         {isFlipped && (
           <div className="card-back">
             {coords && (
@@ -185,7 +174,6 @@ function App() {
                 </div>
               </div>
             )}
-            {/* 버튼: 뒤집기 */}
             <button className="flip-button" onClick={handleCardFlip}>
               날씨 보기
             </button>
