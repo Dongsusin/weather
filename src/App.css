@@ -43,6 +43,8 @@ body {
   perspective: 1000px;
   margin: auto;
   overflow: auto;
+  border: 1px solid #333;
+  border-radius: 10px;
 }
 
 .card .card-front,
@@ -53,7 +55,6 @@ body {
   backface-visibility: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   padding: 20px;
   text-align: center;
